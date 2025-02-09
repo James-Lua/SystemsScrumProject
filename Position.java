@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 class Position {
     private final int x;
     private final int y;

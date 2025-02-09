@@ -1,0 +1,68 @@
+class Subject:
+    observers: List<Observer>
+
+    method addObserver(observer):
+        add observer to observers
+
+    method removeObserver(observer):
+        remove observer from observers
+
+    method notifyObservers(position):
+        for each observer in observers:
+            observer.update(position)
+
+-----------------------------------------
+
+class Player extends Subject:
+    position: Position
+
+    method move(newPosition):
+        position = newPosition
+        notifyObservers(newPosition)
+
+-----------------------------------------
+
+class ChunkManager implements Observer:
+    loadedChunks: Map<Position, Chunk>
+    loadDistance: int  // in chunk units
+
+    method update(newPosition):
+        currentChunk = getChunkCoordinate(newPosition)
+        
+        // Unload chunks out of range
+        for each chunkCoord in loadedChunks.keys():
+            if distance(chunkCoord, currentChunk) > loadDistance:
+                unloadChunk(chunkCoord)
+        
+        // Load chunks within range
+        for each chunkCoord in getChunkRange(currentChunk, loadDistance):
+            if chunkCoord not in loadedChunks:
+                loadChunk(chunkCoord)
+
+    method getChunkCoordinate(position):
+        // Assume CHUNK_SIZE is a constant (e.g., 16)
+        chunkX = floor(position.x / CHUNK_SIZE)
+        chunkY = floor(position.y / CHUNK_SIZE)
+        return new Position(chunkX, chunkY)
+
+    method loadChunk(chunkCoord):
+        chunk = new Chunk(chunkCoord)
+        chunk.load()
+        loadedChunks.put(chunkCoord, chunk)
+
+    method unloadChunk(chunkCoord):
+        chunk = loadedChunks.get(chunkCoord)
+        if chunk exists:
+            chunk.unload()
+            loadedChunks.remove(chunkCoord)
+
+-----------------------------------------
+
+class Chunk:
+    position: Position
+
+    method load():
+        // Logic to load chunk data (possibly asynchronous)
+
+    method unload():
+        // Logic to safely remove chunk data from memory

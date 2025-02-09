@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 abstract class Subject {
     // Encapsulated list of observers.
     private List<Observer> observers = new ArrayList<>();

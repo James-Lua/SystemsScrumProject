@@ -1,3 +1,7 @@
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 class ChunkManager implements Observer {
     // Map to hold loaded chunks, keyed by their chunk coordinate.
     private Map<Position, Chunk> loadedChunks = new HashMap<>();
