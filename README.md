@@ -8,7 +8,7 @@ To submit your work for the sprints:
 
 -------
 
-# Individual - Sprint 1 Requirements (as listed on Canvas):
+# Individual - Sprint Requirements (as listed on Canvas):
 * UML Class diagram ([use mermaid.live](https://mermaid.live/)), save your UML in a text file on your feature branch!
 * Pseudocode an outline of your methods based on your diagram, save this in a text file on your feature branch!
 * Code the java class(es) that you outlined in your diagram. Finished or not - save this as .java file(s) on your feature branch!
