@@ -16,7 +16,7 @@ To submit your work for the sprints:
 
 -------
 
-# Research Done 
+# Research Done 1 
 * Refreshed myself on some java (https://www.w3schools.com/java/)
 * Looked at the libgdx documentation to get a little better understanding
 * Started to create simple drop game in libgdx (https://libgdx.com/wiki/start/a-simple-game)
