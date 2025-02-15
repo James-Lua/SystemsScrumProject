@@ -1,69 +1,88 @@
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
-class ChunkManager implements Observer {
-    // Map to hold loaded chunks, keyed by their chunk coordinate.
-    private Map<Position, Chunk> loadedChunks = new HashMap<>();
-    private int loadDistance; // in chunk units
+class ChunkManager implements Observer, Tickable {
+    // Map of currently loaded chunks and their ticket counters.
+    private Map<Position, LoadedChunk> loadedChunks = new HashMap<>();
+    private int renderDistance;         // in screen units
+    private Position currentPlayerChunk = new Position(0, 0);
+    private final int MAX_TICKET_TICKS = 20;
 
-    // Constant for the size of each chunk (e.g., 16x16 units).
+    // Constants for our tile and screen settings.
     public static final int CHUNK_SIZE = 16;
+    public static final int SCREEN_CHUNKS_WIDTH = 4;  // 4 chunks per screen horizontally
+    public static final int SCREEN_CHUNKS_HEIGHT = 3; // 3 chunks per screen vertically
 
-    public ChunkManager(int loadDistance) {
-        this.loadDistance = loadDistance;
+    public ChunkManager(int renderDistance) {
+        this.renderDistance = Math.max(renderDistance, 1);  // enforce minimum render distance
     }
 
-    // Called when the player's position changes.
+    // Called when the player moves.
     @Override
     public void update(Position newPosition) {
-        Position currentChunk = getChunkCoordinate(newPosition);
-        // Unload chunks that are now out of range.
-        Iterator<Position> iterator = loadedChunks.keySet().iterator();
-        while (iterator.hasNext()) {
-            Position chunkCoord = iterator.next();
-            if (distance(chunkCoord, currentChunk) > loadDistance) {
-                Chunk chunk = loadedChunks.get(chunkCoord);
-                chunk.unload();
-                iterator.remove();
+        currentPlayerChunk = getChunkCoordinate(newPosition);
+        System.out.println("moved");
+    }
+
+    // Called each tick by the TickManager.
+    @Override
+    public void tick() {
+        // Calculate the desired loaded area based on the player's current chunk.
+        Set<Position> desiredArea = getLoadedArea(currentPlayerChunk);
+
+        // For each desired chunk, load or refresh it.
+        for (Position coord : desiredArea) {
+            if (loadedChunks.containsKey(coord)) {
+                loadedChunks.get(coord).refreshTicket(MAX_TICKET_TICKS);
+            } else {
+                loadChunk(coord);
             }
         }
-        // Load any chunks within the render distance that are not yet loaded.
-        for (int dx = -loadDistance; dx <= loadDistance; dx++) {
-            for (int dy = -loadDistance; dy <= loadDistance; dy++) {
-                Position neighborChunk = new Position(currentChunk.getX() + dx, currentChunk.getY() + dy);
-                if (!loadedChunks.containsKey(neighborChunk)) {
-                    loadChunk(neighborChunk);
+
+        // For each loaded chunk outside the desired area, decrement its ticket and unload if needed.
+        Iterator<Map.Entry<Position, LoadedChunk>> iter = loadedChunks.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Position, LoadedChunk> entry = iter.next();
+            Position coord = entry.getKey();
+            if (!desiredArea.contains(coord)) {
+                LoadedChunk lc = entry.getValue();
+                lc.decrementTicket();
+                if (lc.getTicketTicks() <= 0) {
+                    lc.getChunk().unload();
+                    iter.remove();
                 }
             }
         }
     }
 
-    // Convert a world position to a chunk coordinate.
+    // Convert a world tile position to a chunk coordinate.
     private Position getChunkCoordinate(Position position) {
-        int chunkX = (int) Math.floor((double) position.getX() / CHUNK_SIZE);
-        int chunkY = (int) Math.floor((double) position.getY() / CHUNK_SIZE);
+        int chunkX = (int)Math.floor((double) position.getX() / CHUNK_SIZE);
+        int chunkY = (int)Math.floor((double) position.getY() / CHUNK_SIZE);
         return new Position(chunkX, chunkY);
     }
 
-    // Load a chunk at the specified chunk coordinate.
+    // Calculate the desired area of loaded chunks based on the player's current chunk.
+    private Set<Position> getLoadedArea(Position centerChunk) {
+        Set<Position> area = new HashSet<>();
+        int totalScreens = (2 * renderDistance) + 1;  // e.g., 9 screens if renderDistance is 4
+        int totalWidth = totalScreens * SCREEN_CHUNKS_WIDTH;   // e.g., 9 * 4 = 36 chunks wide
+        int totalHeight = totalScreens * SCREEN_CHUNKS_HEIGHT; // e.g., 9 * 3 = 27 chunks high
+        int halfWidth = totalWidth / 2;
+        int halfHeight = totalHeight / 2;
+
+        for (int x = centerChunk.getX() - halfWidth; x <= centerChunk.getX() + halfWidth; x++) {
+            for (int y = centerChunk.getY() - halfHeight; y <= centerChunk.getY() + halfHeight; y++) {
+                area.add(new Position(x, y));
+            }
+        }
+        return area;
+    }
+
+    // Load a new chunk at the specified coordinate.
     private void loadChunk(Position chunkCoord) {
         Chunk chunk = new Chunk(chunkCoord);
         chunk.load();
-        loadedChunks.put(chunkCoord, chunk);
-    }
-
-    // Unload a chunk at the specified chunk coordinate.
-    private void unloadChunk(Position chunkCoord) {
-        Chunk chunk = loadedChunks.get(chunkCoord);
-        if (chunk != null) {
-            chunk.unload();
-            loadedChunks.remove(chunkCoord);
-        }
-    }
-
-    // Helper method to calculate Manhattan distance between two chunk coordinates.
-    private int distance(Position a, Position b) {
-        return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
+        LoadedChunk loadedChunk = new LoadedChunk(chunk, MAX_TICKET_TICKS);
+        loadedChunks.put(chunkCoord, loadedChunk);
     }
 }
