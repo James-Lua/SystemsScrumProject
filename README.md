@@ -13,33 +13,3 @@ To submit your work for the sprints:
 * Pseudocode an outline of your methods based on your diagram, save this in a text file on your feature branch!
 * Code the java class(es) that you outlined in your diagram. Finished or not - save this as .java file(s) on your feature branch!
 * If you have any issues with this process, contact me on Discord.
-
-
-
-
-
-Slide 1:
-	
-1. The code creates a File Handler system written in the Command Design Pattern. It handles files regardless of OS.
-
-2. The code determines the user's OS through a utility class and runs file handling code based on both requested command and requester's OS.
-
-3. The FileInvoker class is decoupled from the request process by taking only the command requested by the user and executing it on what will become the OS-specific file, like a Unix File. Invoker wont know what type of request is made (Open, Write, Close), and have no knowledge of whether the file it invokes is defined as Unix or Windows. It essentially stores the a call for use after modifications are made.
-
-Slide 2: 
-
-
-Slide 3:
-
-1. Like mentioned in S1Q3, The FileInvoker captures the command that will be invoked from the initial request and passes it to the constructor. The Receiver classes are decoupled from the invoker and do not communicate at all, as they do not need to. The File System is recognized and decides which receiver will be used, and the constructor will call the receiver with the command invoked, saved in the Invoker object via the FileInvoker class.
-
-2. I believe so, the FileInvoker class is very simple and is designed to capture the base command invoked for use with code that is friendly to the invoker's file language, specific to their OS.
-
-Slide 4:
-
-
-Slide 5:
-
-1. Polymorphism (adapting which classes are called based on OS), Code to Interfaces (Command and FileSystemReceiver interface), Factory Design Pattern (FileSystemReceiverUtil), Command Design Pattern (The whole thing). Encapsulation/Single Responsibility.
-
-2. ♪  ┏(・o・)┛  ♪  ┗( ・o・)┓  ♪
