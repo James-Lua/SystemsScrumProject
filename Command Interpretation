@@ -8,9 +8,11 @@ Slide 1:
 
 Slide 2: 
 
-2. It allows us to implement the command within the specific class not allowing others to invoke it separately
+1. File attached.
 
-3. FileSystemReceiver is made an interface as there components are used within all the classes there are composed of as its implementation can be considered part of the abstract factory design which declares an interface as a set of methods for creating each of the abstract products
+2. It allows us to implement the command within the specific class not allowing others to invoke it separately.
+
+3. FileSystemReceiver is made an interface as there components are used within all the classes there are composed of as its implementation can be considered part of the abstract factory design which declares an interface as a set of methods for creating each of the abstract products.
 
 4. There is no need of a getCommand method as we use execute instead of it. If we look into the Composition design pattern where it's established that a command will not know the concrete classes instead it will work with the elements found only in the interface used.
 
