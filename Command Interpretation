@@ -6,7 +6,13 @@ Slide 1:
 
 3. The FileInvoker class is decoupled from the request process by taking only the command requested by the user and executing it on what will become the OS-specific file, like a Unix File. Invoker wont know what type of request is made (Open, Write, Close), and have no knowledge of whether the file it invokes is defined as Unix or Windows. It essentially stores the a call for use after modifications are made.
 
-Slide 2: Ashly
+Slide 2: 
+
+2. It allows us to implement the command within the specific class not allowing others to invoke it separately
+
+3. FileSystemReceiver is made an interface as there components are used within all the classes there are composed of as its implementation can be considered part of the abstract factory design which declares an interface as a set of methods for creating each of the abstract products
+
+4. There is no need of a getCommand method as we use execute instead of it. If we look into the Composition design pattern where it's established that a command will not know the concrete classes instead it will work with the elements found only in the interface used.
 
 Slide 3:
 
@@ -14,7 +20,11 @@ Slide 3:
 
 2. I believe so, the FileInvoker class is very simple and is designed to capture the base command invoked for use with code that is friendly to the invoker's file language, specific to their OS.
 
-Slide 4: Ashly
+Slide 4:
+
+1. As mentioned in the previously there is no need of any concrete command classes as there not required for any class built with a composition design pattern as their classes are not in the need to know the concrete classes of its children as it will works with all sub-elements only that compose the interface. 
+
+2. Yes, using lambda expressions which will reduce are code within our FileSystemClient class. The only problem with this we tie the command not allowing us to do further implementations as we can say that it turns it to concrete object. 
 
 Slide 5:
 
